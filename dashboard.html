@@ -490,7 +490,7 @@ window._onGopangAuth = async function(u) {
       try {
         const now = new Date().toISOString();
         await fetch(PROXY+'/pdv/report', {method:'POST',headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({report:{svc:'k119',type:'event',
+          body:JSON.stringify({report:{svc:'911',type:'event',
             who:{ipv6:guid,role:'user',level:u.level||'L0',recipients:['gopang-pdv']},
             when:{period_start:now,period_end:now},
             where:{svc_url:'https://911.gopang.net/dashboard.html'},

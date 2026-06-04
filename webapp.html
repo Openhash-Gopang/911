@@ -466,7 +466,7 @@ async function handleEmergency(text) {
     const guid = _user.ipv6 || _user.guid;
     const now = new Date().toISOString();
     fetch(PROXY_BASE+'/pdv/report', {method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({report:{svc:'k119',type:'dispatch',
+      body:JSON.stringify({report:{svc:'911',type:'dispatch',
         who:{ipv6:guid,role:'user',level:_user.level||'L0',recipients:['gopang-pdv']},
         when:{period_start:now,period_end:now},
         where:{svc_url:'https://911.gopang.net/webapp.html'},
@@ -549,7 +549,7 @@ window._onGopangAuth = async function(user) {
   try {
     const now = new Date().toISOString();
     const res = await fetch(PROXY_BASE+'/pdv/report', {method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({report:{svc:'k119',type:'event',
+      body:JSON.stringify({report:{svc:'911',type:'event',
         who:{ipv6:guid,role:'user',level:user?.level||'L0',recipients:['gopang-pdv']},
         when:{period_start:now,period_end:now},
         where:{svc_url:'https://911.gopang.net/webapp.html'},

@@ -553,7 +553,7 @@ table.rt td.blue{color:var(--blue)!important}
           PDV 레코드 샘플 — 접속
         </div>
         <table class="rt">
-          <tr><td>svc</td><td class="green">k119</td></tr>
+          <tr><td>svc</td><td class="green">911</td></tr>
           <tr><td>type</td><td>event</td></tr>
           <tr><td>who.ipv6</td><td>2601:db80:bd05:…</td></tr>
           <tr><td>who.level</td><td>L3</td></tr>
@@ -567,7 +567,7 @@ table.rt td.blue{color:var(--blue)!important}
           PDV 레코드 샘플 — 출동
         </div>
         <table class="rt">
-          <tr><td>svc</td><td class="green">k119</td></tr>
+          <tr><td>svc</td><td class="green">911</td></tr>
           <tr><td>type</td><td>dispatch_complete</td></tr>
           <tr><td>what.severity</td><td class="red">1급 (위독)</td></tr>
           <tr><td>what.dispatch_no</td><td>FD-20260604-2847</td></tr>
@@ -633,9 +633,9 @@ table.rt td.blue{color:var(--blue)!important}
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><path d="M11 6l.463-.536a5 5 0 0 1 7.071 7.072l-.534.464"/><path d="M13 18l-.397.534a5.068 5.068 0 0 1-7.127 0 4.972 4.972 0 0 1 0-7.071l.524-.463"/></svg>
           인프라 — OpenHash + Supabase
         </h3>
-        <p>gopang-proxy Worker(v4.3)가 DeepSeek API·Kakao 역지오코딩·SSO를 프록시합니다. PDV는 Supabase에 저장. svc alias: k119 → 911.</p>
+        <p>gopang-proxy Worker(v4.3)가 DeepSeek API·Kakao 역지오코딩·SSO를 프록시합니다. PDV는 Supabase에 저장. svc: '911' (직접 사용).</p>
         <ul class="access-list">
-          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 10-10"/></svg>svc alias: k119 → 911</li>
+          <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 10-10"/></svg>svc: '911' (직접 사용)</li>
           <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 10-10"/></svg>Cloudflare Worker v4.3</li>
           <li><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 10-10"/></svg>K-Police·K-Law 연동</li>
         </ul>
@@ -745,7 +745,7 @@ window._onGopangAuth = async function(user) {
         const res = await fetch(PROXY_BASE + '/pdv/report', {
           method: 'POST', headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ report: {
-            svc: 'k119', type: 'event',
+            svc: '911', type: 'event',
             who:   { ipv6: guid, role: 'user', level: user?.level || 'L0', recipients: ['gopang-pdv'] },
             when:  { period_start: now, period_end: now },
             where: { svc_url: 'https://911.gopang.net/desktop.html' },
