@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>K-119 종합상황실</title>
+<link rel="icon" href="data:,">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f8f9fa;--sur:#fff;
+  --bd:rgba(0,0,0,.09);--bd2:rgba(0,0,0,.16);
+  --t1:#1c1c1e;--t2:#4a4a55;--t3:#9898a6;
+  --brand:#3ecf8e;--brand-bg:rgba(62,207,142,.07);--brand-bd:rgba(62,207,142,.22);
+  --red:#dc2626;--red-bg:rgba(220,38,38,.06);--red-bd:rgba(220,38,38,.2);
+  --orange:#ea580c;--orange-bg:rgba(234,88,12,.06);
+  --green:#16a34a;--green-bg:rgba(22,163,74,.06);--green-bd:rgba(22,163,74,.2);
+  --font:'Noto Sans KR',-apple-system,sans-serif;
+  --r:5px;--r2:8px;--sb:48px;--sb-open:220px;--top:44px;
+}
+@media(prefers-color-scheme:dark){:root{--bg:#0f0f0f;--sur:#1c1c1e;--bd:rgba(255,255,255,.1);--bd2:rgba(255,255,255,.2);--t1:#f5f5f7;--t2:#a1a1aa;--t3:#52525b}}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);font-size:13px;color:var(--t1);background:var(--bg);-webkit-font-smoothing:antialiased;line-height:1.5}
+a{text-decoration:none;color:inherit}
+button{font-family:var(--font);cursor:pointer}
+
+/* ── SIDEBAR ── */
+body.has-sidebar{padding-left:var(--sb)}
+.sidebar{position:fixed;top:0;left:0;bottom:0;width:var(--sb);background:var(--sur);border-right:.5px solid var(--bd);display:flex;flex-direction:column;z-index:200;overflow:hidden;transition:width 200ms cubic-bezier(.4,0,.2,1)}
+.sidebar:hover{width:var(--sb-open);box-shadow:2px 0 20px rgba(0,0,0,.08)}
+.sb-logo{display:flex;align-items:center;gap:10px;padding:0 13px;height:var(--top);border-bottom:.5px solid var(--bd);flex-shrink:0;overflow:hidden;white-space:nowrap;text-decoration:none;color:var(--t1)}
+.sb-logo-mark{width:22px;height:22px;background:var(--brand);border-radius:4px;display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+.sb-logo-text{font-size:13px;font-weight:500;opacity:0;transition:opacity 140ms ease 20ms;white-space:nowrap}
+.sidebar:hover .sb-logo-text{opacity:1}
+.sb-nav{flex:1;padding:4px;overflow:hidden;display:flex;flex-direction:column;gap:1px}
+.sb-section{padding:10px 10px 2px;font-size:10px;font-weight:500;letter-spacing:.07em;color:var(--t3);text-transform:uppercase;white-space:nowrap;opacity:0;transition:opacity 130ms ease}
+.sidebar:hover .sb-section{opacity:1}
+.sb-item{display:flex;align-items:center;gap:10px;padding:0 9px;height:34px;border-radius:var(--r);color:var(--t2);white-space:nowrap;overflow:hidden;cursor:pointer;transition:background 100ms,color 100ms;flex-shrink:0;text-decoration:none}
+.sb-item:hover{background:rgba(0,0,0,.04);color:var(--t1)}
+.sb-item.active{background:var(--brand-bg);color:#1a7a4e}
+.sb-icon{flex-shrink:0;width:18px;height:18px;display:block;opacity:.7}
+.sb-item.active .sb-icon,.sb-item:hover .sb-icon{opacity:1}
+.sb-label{font-size:13px;opacity:0;transition:opacity 140ms ease 20ms;white-space:nowrap}
+.sidebar:hover .sb-label{opacity:1}
+.sb-sep{height:.5px;background:var(--bd);margin:4px 0;flex-shrink:0}
+.sb-bottom{padding:4px;border-top:.5px solid var(--bd);flex-shrink:0;display:flex;flex-direction:column;gap:1px}
+
+/* ── TOPBAR ── */
+.topbar{position:fixed;top:0;left:var(--sb);right:0;height:var(--top);background:var(--sur);border-bottom:.5px solid var(--bd);display:flex;align-items:center;padding:0 16px;gap:10px;z-index:100;transition:left 200ms cubic-bezier(.4,0,.2,1)}
+.topbar-title{font-size:13px;font-weight:500;color:var(--t1)}
+.topbar-chip{display:inline-flex;align-items:center;gap:4px;border:.5px solid var(--bd2);border-radius:3px;padding:2px 7px;font-size:11px;color:var(--t2)}
+.topbar-chip.red{border-color:var(--red-bd);background:var(--red-bg);color:var(--red)}
+.topbar-chip.green{border-color:var(--brand-bd);background:var(--brand-bg);color:#1a7a4e}
+.pulse{width:5px;height:5px;border-radius:50%;flex-shrink:0;animation:pulse 2s infinite}
+.pulse.red{background:var(--red)}.pulse.green{background:var(--brand)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.btn{display:inline-flex;align-items:center;gap:5px;padding:5px 11px;border-radius:var(--r);font-size:12px;font-weight:500;border:.5px solid var(--bd2);background:var(--sur);color:var(--t1);cursor:pointer;transition:all .1s;font-family:var(--font);text-decoration:none}
+.btn:hover{background:var(--bg)}
+.btn.red{background:var(--red);border-color:var(--red);color:#fff}
+.btn.red:hover{background:#b91c1c}
+.btn.brand{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.brand:hover{background:#2db87a}
+#clock{font-size:12px;font-family:monospace;color:var(--t3);letter-spacing:.04em}
+
+/* ── MAIN ── */
+.main{position:fixed;top:var(--top);left:var(--sb);right:0;bottom:0;display:flex;flex-direction:column;overflow:hidden;transition:left 200ms cubic-bezier(.4,0,.2,1)}
+
+/* ── VIEWS ── */
+.view{display:none;flex-direction:column;flex:1;overflow:hidden}
+.view.active{display:flex}
+
+/* ── STAT BAR ── */
+.stat-bar{display:grid;border-bottom:.5px solid var(--bd);background:var(--sur);flex-shrink:0}
+.stat-cell{padding:10px 16px;border-right:.5px solid var(--bd)}
+.stat-cell:last-child{border-right:none}
+.stat-lbl{font-size:10px;color:var(--t3);margin-bottom:3px;text-transform:uppercase;letter-spacing:.03em}
+.stat-val{font-size:20px;font-weight:500;color:var(--t1);line-height:1;font-variant-numeric:tabular-nums}
+.stat-val.red{color:var(--red)}.stat-val.orange{color:var(--orange)}.stat-val.green{color:#1a7a4e}.stat-val.blue{color:var(--brand)}
+.stat-sub{font-size:10px;color:var(--t3);margin-top:2px}
+
+/* ── PANELS ── */
+.panel{background:var(--sur);border:.5px solid var(--bd);border-radius:var(--r2);overflow:hidden}
+.panel-hd{padding:9px 14px;border-bottom:.5px solid var(--bd);font-size:12px;font-weight:500;color:var(--t1);display:flex;align-items:center;gap:6px;flex-shrink:0}
+.panel-hd svg{color:var(--t3)}
+.panel-hd-r{margin-left:auto;font-size:11px;color:var(--t3)}
+
+/* ── TABLES ── */
+table.dt{width:100%;border-collapse:collapse;font-size:12px}
+table.dt th{padding:6px 12px;text-align:left;font-size:10px;font-weight:500;color:var(--t3);border-bottom:.5px solid var(--bd);background:var(--bg);position:sticky;top:0;letter-spacing:.04em;text-transform:uppercase}
+table.dt td{padding:7px 12px;border-bottom:.5px solid var(--bd);color:var(--t2);vertical-align:middle}
+table.dt tr:last-child td{border-bottom:none}
+table.dt tr:hover td{background:var(--bg)}
+.chip{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:500;border:.5px solid}
+.chip-red{background:var(--red-bg);color:var(--red);border-color:var(--red-bd)}
+.chip-orange{background:var(--orange-bg);color:var(--orange);border-color:rgba(234,88,12,.25)}
+.chip-green{background:var(--brand-bg);color:#1a7a4e;border-color:var(--brand-bd)}
+.chip-blue{background:rgba(29,78,216,.06);color:#1d4ed8;border-color:rgba(29,78,216,.2)}
+.chip-gray{background:var(--bg);color:var(--t2);border-color:var(--bd2)}
+.act-btn{background:none;border:.5px solid var(--bd2);border-radius:3px;padding:2px 7px;font-size:11px;color:var(--t2);cursor:pointer;font-family:var(--font);transition:all .1s}
+.act-btn:hover{background:var(--brand);border-color:var(--brand);color:#fff}
+.act-btn.approve{background:var(--brand);border-color:var(--brand);color:#fff}
+
+/* ── SCROLL ── */
+.scroll-y{overflow-y:auto;flex:1}
+.scroll-y::-webkit-scrollbar{width:4px}
+.scroll-y::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px}
+
+/* ── V1 LAYOUT ── */
+#v1 .body{flex:1;display:grid;grid-template-columns:1fr 300px;overflow:hidden}
+#v1 .left{display:flex;flex-direction:column;border-right:.5px solid var(--bd);overflow:hidden}
+#v1 .map-area{flex:1;position:relative;background:#eef2f7}
+#v1 .map-area canvas{width:100%;height:100%;display:block}
+#v1 .disp-panel{flex-shrink:0;height:230px;display:flex;flex-direction:column;border-top:.5px solid var(--bd)}
+#v1 .right{display:flex;flex-direction:column;overflow:hidden}
+#v1 .feed-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;border-bottom:.5px solid var(--bd)}
+#v1 .unit-panel{flex-shrink:0;height:190px;display:flex;flex-direction:column;overflow:hidden}
+.feed-item{display:flex;align-items:flex-start;gap:8px;padding:7px 12px;border-bottom:.5px solid var(--bd);font-size:11px}
+.feed-item:last-child{border-bottom:none}
+.feed-time{color:var(--t3);white-space:nowrap;font-family:monospace;font-size:10px;margin-top:1px}
+.feed-msg{color:var(--t2);line-height:1.4}
+.unit-row{display:flex;align-items:center;gap:8px;padding:7px 12px;border-bottom:.5px solid var(--bd);font-size:11px}
+.unit-row:last-child{border-bottom:none}
+.unit-av{width:24px;height:24px;border-radius:4px;background:var(--brand-bg);border:.5px solid var(--brand-bd);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.unit-name{font-weight:500;color:var(--t1);font-size:11px}
+.unit-role{font-size:10px;color:var(--t3)}
+.unit-eta{margin-left:auto;font-size:11px;color:#1a7a4e;font-weight:500}
+
+/* ── V2~V6 BODY ── */
+.view-body{flex:1;padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.view-body::-webkit-scrollbar{width:4px}
+.view-body::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px}
+.v4-body{flex:1;display:grid;grid-template-columns:1fr 280px;overflow:hidden}
+.v4-left{padding:14px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.v4-right{border-left:.5px solid var(--bd);display:flex;flex-direction:column;overflow:hidden}
+.v6-body{flex:1;display:grid;grid-template-columns:1fr 310px;overflow:hidden}
+.v6-left{display:flex;flex-direction:column;border-right:.5px solid var(--bd)}
+.v6-map{flex:1;position:relative;background:#eef2f7}
+.v6-map canvas{width:100%;height:100%;display:block}
+.v6-drill{flex-shrink:0;height:200px;display:flex;flex-direction:column;border-top:.5px solid var(--bd)}
+.v6-right{padding:12px;overflow-y:auto;display:flex;flex-direction:column;gap:10px}
+
+/* ── GRID ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* ── MAP ── */
+.map-info{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.95);border:.5px solid var(--bd);border-radius:var(--r2);padding:7px 11px;font-size:11px;color:var(--t2);z-index:10;pointer-events:none}
+.map-legend{position:absolute;bottom:10px;left:10px;background:rgba(255,255,255,.95);border:.5px solid var(--bd);border-radius:var(--r2);padding:8px 11px;font-size:10px;display:flex;flex-direction:column;gap:4px;z-index:10}
+.leg-row{display:flex;align-items:center;gap:6px;color:var(--t2)}
+.leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.breadcrumb{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--t3);padding:8px 12px;border-bottom:.5px solid var(--bd);flex-shrink:0}
+.breadcrumb span.link{color:var(--brand);cursor:pointer}
+.breadcrumb span.link:hover{text-decoration:underline}
+
+/* ── FUNNEL ── */
+.funnel-wrap{display:flex;flex-direction:column;gap:4px;padding:12px}
+.funnel-step{display:flex;align-items:center;gap:10px}
+.funnel-bar-wrap{flex:1;background:var(--bg);border-radius:2px;height:22px;overflow:hidden;border:.5px solid var(--bd)}
+.funnel-bar{height:100%;background:var(--brand);display:flex;align-items:center;padding:0 8px;font-size:11px;color:#fff;font-weight:500;border-radius:2px}
+.funnel-label{font-size:11px;color:var(--t2);width:90px;flex-shrink:0;text-align:right}
+.funnel-val{font-size:11px;color:var(--t3);width:50px;flex-shrink:0;font-family:monospace}
+
+/* ── EQUIP BAR ── */
+.equip-item{display:flex;flex-direction:column;gap:3px}
+.equip-bar-wrap{height:4px;background:var(--bg);border-radius:2px;overflow:hidden;border:.5px solid var(--bd)}
+.equip-bar-fill{height:100%;background:var(--brand);border-radius:2px}
+
+/* ── HEATMAP ── */
+.hm-table{border-collapse:collapse;width:100%;font-size:11px}
+.hm-table th{padding:4px 6px;font-size:10px;font-weight:500;color:var(--t3);text-align:center;border:.5px solid var(--bd);background:var(--bg)}
+.hm-table td{padding:3px 6px;text-align:center;border:.5px solid var(--bd)}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;top:52px;right:12px;z-index:500;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{background:var(--sur);border:.5px solid var(--bd);border-radius:var(--r2);padding:9px 13px;font-size:12px;box-shadow:0 4px 16px rgba(0,0,0,.1);display:flex;align-items:flex-start;gap:8px;max-width:260px;pointer-events:auto;animation:toastIn .18s ease}
+.toast.red{border-color:var(--red-bd)}
+.toast.green{border-color:var(--brand-bd)}
+.toast-title{font-weight:500;color:var(--t1);margin-bottom:1px}
+.toast-sub{color:var(--t3);font-size:11px}
+@keyframes toastIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <a href="desktop.html" class="sb-logo">
+    <div class="sb-logo-mark">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    </div>
+    <span class="sb-logo-text">K-119 종합상황실</span>
+  </a>
+  <nav class="sb-nav">
+    <div class="sb-section">대시보드</div>
+    <div class="sb-item active" onclick="showView('v1')" id="menu-v1">
+      <svg class="sb-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      <span class="sb-label">실시간 출동</span>
+    </div>
+    <div class="sb-item" onclick="showView('v2')" id="menu-v2">
+      <svg class="sb-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span class="sb-label">재난 통계</span>
+    </div>
+    <div class="sb-item" onclick="showView('v3')" id="menu-v3">
+      <svg class="sb-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <span class="sb-label">구급 환자 분석</span>
+    </div>
+    <div class="sb-item" onclick="showView('v4')" id="menu-v4">
+      <svg class="sb-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 4v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      <span class="sb-label">자원 현황</span>
+    </div>
+    <div class="sb-item" onclick="showView('v5')" id="menu-v5">
+      <svg class="sb-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      <span class="sb-label">병원 연계</span>
+    </div>
+    <div class="sb-item" onclick="showView('v6')" id="menu-v6">
+      <svg class="sb-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+      <span class="sb-label">지역 분석</span>
+    </div>
+    <div class="sb-sep"></div>
+    <div class="sb-section">서비스</div>
+    <a href="desktop.html" class="sb-item"><svg class="sb-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span class="sb-label">서비스 소개</span></a>
+    <a href="webapp.html" class="sb-item"><svg class="sb-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg><span class="sb-label">K-119 앱</span></a>
+    <a href="https://police.gopang.net" class="sb-item"><svg class="sb-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span class="sb-label">K-Police</span></a>
+  </nav>
+  <div class="sb-bottom">
+    <a href="https://gopang.net" class="sb-item"><svg class="sb-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M5 12l6 6"/><path d="M5 12l6-6"/></svg><span class="sb-label">고팡으로</span></a>
+  </div>
+</aside>
+
+<!-- TOPBAR -->
+<div class="topbar" id="topbar">
+  <div class="topbar-title" id="view-title">실시간 출동</div>
+  <span class="topbar-chip red" id="status-chip"><span class="pulse red"></span>1급 <span id="sev1-cnt">3</span>건 처리 중</span>
+  <span id="clock"></span>
+  <div class="topbar-right">
+    <span class="btn" id="officer-lv">L0 대원</span>
+    <button class="btn red" onclick="allDispatch()">전체 긴급 출동</button>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="main-area">
+
+<!-- ══ V1 실시간 출동 ══ -->
+<div class="view active" id="v1">
+  <div class="stat-bar" style="grid-template-columns:repeat(6,1fr)">
+    <div class="stat-cell"><div class="stat-lbl">전국 출동 중</div><div class="stat-val red" id="v1-active">24</div><div class="stat-sub">+4 최근 1시간</div></div>
+    <div class="stat-cell"><div class="stat-lbl">1급 위독</div><div class="stat-val red" id="v1-sev1">3</div><div class="stat-sub">즉시 처치 필요</div></div>
+    <div class="stat-cell"><div class="stat-lbl">출동 대원</div><div class="stat-val orange" id="v1-crew">87</div><div class="stat-sub">헬기 3대 포함</div></div>
+    <div class="stat-cell"><div class="stat-lbl">대기 인력</div><div class="stat-val green" id="v1-standby">312</div><div class="stat-sub">전국 소방서</div></div>
+    <div class="stat-cell"><div class="stat-lbl">오늘 PDV 기록</div><div class="stat-val blue" id="v1-pdv">2,847</div><div class="stat-sub">Supabase 동기화</div></div>
+    <div class="stat-cell"><div class="stat-lbl">오늘 처리 완료</div><div class="stat-val green" id="v1-done">631</div><div class="stat-sub">평균 도착 5.8분</div></div>
+  </div>
+  <div class="body">
+    <div class="left">
+      <div class="map-area">
+        <canvas id="map-canvas"></canvas>
+        <div class="map-info">전국 실시간 출동 지도 · K-119</div>
+        <div class="map-legend">
+          <div class="leg-row"><span class="leg-dot" style="background:#dc2626"></span>1급 위독</div>
+          <div class="leg-row"><span class="leg-dot" style="background:#ea580c"></span>2급 긴급</div>
+          <div class="leg-row"><span class="leg-dot" style="background:#ca8a04"></span>3급 응급</div>
+          <div class="leg-row"><span class="leg-dot" style="background:#3ecf8e"></span>출동 대원</div>
+          <div class="leg-row"><span class="leg-dot" style="background:#7c3aed"></span>헬기·AV</div>
+        </div>
+      </div>
+      <div class="disp-panel">
+        <div class="panel-hd">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          출동 목록
+          <div class="panel-hd-r" id="disp-filter-lbl">전국 전체</div>
+        </div>
+        <div class="scroll-y">
+          <table class="dt"><thead><tr><th>출동번호</th><th>중증도</th><th>유형</th><th>위치</th><th>상태</th><th>경과</th><th>조치</th></tr></thead>
+          <tbody id="disp-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+    <div class="right">
+      <div class="feed-panel">
+        <div class="panel-hd">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          실시간 신고 피드
+          <div class="panel-hd-r">Live</div>
+        </div>
+        <div class="scroll-y" id="feed-list"></div>
+      </div>
+      <div class="unit-panel">
+        <div class="panel-hd">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 4v3h-7V8z"/></svg>
+          출동 자원 현황
+          <div class="panel-hd-r">상위 8건</div>
+        </div>
+        <div class="scroll-y" id="unit-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ V2 재난 통계 ══ -->
+<div class="view" id="v2">
+  <div class="stat-bar" style="grid-template-columns:repeat(5,1fr)">
+    <div class="stat-cell"><div class="stat-lbl">연간 출동 (2024)</div><div class="stat-val">4,284,131</div><div class="stat-sub">전년 대비 +3.2%</div></div>
+    <div class="stat-cell"><div class="stat-lbl">구급 출동</div><div class="stat-val blue">3,121,847</div><div class="stat-sub">전체의 72.9%</div></div>
+    <div class="stat-cell"><div class="stat-lbl">화재 출동</div><div class="stat-val red">421,284</div><div class="stat-sub">전체의 9.8%</div></div>
+    <div class="stat-cell"><div class="stat-lbl">최다 발생 시간</div><div class="stat-val">오후 6~8시</div><div class="stat-sub">전체의 9.7%</div></div>
+    <div class="stat-cell"><div class="stat-lbl">평균 도착 시간</div><div class="stat-val green">5.8분</div><div class="stat-sub">도시 4.1 / 농촌 9.8</div></div>
+  </div>
+  <div class="view-body">
+    <div class="g2">
+      <div class="panel"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>출동 유형별 구성비</div><div style="padding:12px"><canvas id="c-donut" height="200"></canvas></div></div>
+      <div class="panel"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>월별 출동 추세 (2024)</div><div style="padding:12px"><canvas id="c-trend" height="200"></canvas></div></div>
+    </div>
+    <div class="g2">
+      <div class="panel"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>시도별 출동 건수</div><div style="padding:12px"><canvas id="c-region" height="220"></canvas></div></div>
+      <div class="panel"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>시간대별 출동 분포 (0~23시)</div><div style="padding:12px"><canvas id="c-hour" height="220"></canvas></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>출동 유형 × 시도 크로스탭</div>
+      <div class="scroll-y" style="max-height:200px"><div style="padding:12px;overflow-x:auto" id="crosstab-wrap"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ V3 구급 환자 분석 ══ -->
+<div class="view" id="v3">
+  <div class="stat-bar" style="grid-template-columns:repeat(5,1fr)">
+    <div class="stat-cell"><div class="stat-lbl">연간 구급 이송 (2024)</div><div class="stat-val">2,184,821</div><div class="stat-sub">전년 대비 +2.8%</div></div>
+    <div class="stat-cell"><div class="stat-lbl">최다 연령대</div><div class="stat-val blue">70대+</div><div class="stat-sub">28.4% (620,249명)</div></div>
+    <div class="stat-cell"><div class="stat-lbl">심정지 생존율</div><div class="stat-val green">8.7%</div><div class="stat-sub">전년 대비 +0.9%p</div></div>
+    <div class="stat-cell"><div class="stat-lbl">1급 위독 비율</div><div class="stat-val red">4.2%</div><div class="stat-sub">91,763명</div></div>
+    <div class="stat-cell"><div class="stat-lbl">병원 도착 전 처치율</div><div class="stat-val green">84.1%</div><div class="stat-sub">AI 가이드 효과</div></div>
+  </div>
+  <div class="view-body">
+    <div class="g2">
+      <div class="panel"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>연령대별 구급 이송 (피라미드)</div><div style="padding:12px"><canvas id="c-pyramid" height="220"></canvas></div></div>
+      <div class="panel"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>연령대 × 질환유형 히트맵</div><div style="padding:12px;overflow-x:auto" id="age-heatmap"></div></div>
+    </div>
+    <div class="g2">
+      <div class="panel"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>심정지 생존율 추세 (5개년)</div><div style="padding:12px"><canvas id="c-survival" height="200"></canvas></div></div>
+      <div class="panel"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>중증도별 이송 비율</div><div style="padding:12px"><canvas id="c-sev-donut" height="200"></canvas></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>중증 환자 현황 (진행 중)</div>
+      <div class="scroll-y" style="max-height:180px">
+        <table class="dt"><thead><tr><th>출동번호</th><th>중증도</th><th>유형</th><th>연령대</th><th>처치 현황</th><th>이송 병원</th><th>도착</th></tr></thead>
+        <tbody id="patient-tbody"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ V4 자원 현황 ══ -->
+<div class="view" id="v4">
+  <div class="stat-bar" style="grid-template-columns:repeat(6,1fr)">
+    <div class="stat-cell"><div class="stat-lbl">전국 소방관</div><div class="stat-val">62,841</div><div class="stat-sub">인구 10만당 121명</div></div>
+    <div class="stat-cell"><div class="stat-lbl">구급차</div><div class="stat-val blue">1,284</div><div class="stat-sub">AV 구급차 48대</div></div>
+    <div class="stat-cell"><div class="stat-lbl">소방차</div><div class="stat-val blue">5,847</div><div class="stat-sub">화학차 312대</div></div>
+    <div class="stat-cell"><div class="stat-lbl">헬기</div><div class="stat-val blue">48</div><div class="stat-sub">야간 운용 22대</div></div>
+    <div class="stat-cell"><div class="stat-lbl">평균 도착</div><div class="stat-val green">5.8분</div><div class="stat-sub">목표 7분 이내</div></div>
+    <div class="stat-cell"><div class="stat-lbl">현장 처치율</div><div class="stat-val green">84.1%</div><div class="stat-sub">전년 대비 +2.3%p</div></div>
+  </div>
+  <div class="v4-body">
+    <div class="v4-left">
+      <div class="g2">
+        <div class="panel"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>도착 시간 분포 (분)</div><div style="padding:12px"><canvas id="c-eta" height="180"></canvas></div></div>
+        <div class="panel"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>처리 결과 분류</div><div style="padding:12px"><canvas id="c-result" height="180"></canvas></div></div>
+      </div>
+      <div class="g2">
+        <div class="panel">
+          <div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 4v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>장비 운용 현황</div>
+          <div style="padding:10px;display:flex;flex-direction:column;gap:8px" id="equip-list"></div>
+        </div>
+        <div class="panel"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>월별 출동 건수 추세</div><div style="padding:12px"><canvas id="c-disp-trend" height="180"></canvas></div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>대원별 성과 (상위 10명)</div>
+        <div class="scroll-y" style="max-height:160px">
+          <table class="dt"><thead><tr><th>성명</th><th>계급</th><th>소속</th><th>출동 횟수</th><th>평균 도착</th><th>처치율</th><th>평가</th></tr></thead>
+          <tbody id="crew-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+    <div class="v4-right">
+      <div class="panel-hd" style="padding:10px 14px;border-bottom:.5px solid var(--bd)">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 11 22 2 13 21 11 13 3 11"/></svg>
+        자원 배치 지도
+      </div>
+      <div style="flex:1;position:relative;background:#eef2f7">
+        <canvas id="map-canvas2"></canvas>
+        <div class="map-legend">
+          <div class="leg-row"><span class="leg-dot" style="background:#3ecf8e"></span>구급대 출동</div>
+          <div class="leg-row"><span class="leg-dot" style="background:#dc2626"></span>소방 출동</div>
+          <div class="leg-row"><span class="leg-dot" style="background:#7c3aed"></span>헬기</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ V5 병원 연계 ══ -->
+<div class="view" id="v5">
+  <div class="stat-bar" style="grid-template-columns:repeat(5,1fr)">
+    <div class="stat-cell"><div class="stat-lbl">이송 환자 (2024)</div><div class="stat-val">2,184,821</div><div class="stat-sub">전체 출동의 51%</div></div>
+    <div class="stat-cell"><div class="stat-lbl">병원 수용률</div><div class="stat-val green">96.4%</div><div class="stat-sub">AI 매칭 효과</div></div>
+    <div class="stat-cell"><div class="stat-lbl">평균 병원 매칭</div><div class="stat-val green">0.8분</div><div class="stat-sub">수동 대비 -92%</div></div>
+    <div class="stat-cell"><div class="stat-lbl">이송 거부 건수</div><div class="stat-val red">78,413</div><div class="stat-sub">응급실 과포화</div></div>
+    <div class="stat-cell"><div class="stat-lbl">평균 처리 기간</div><div class="stat-val">24.3일</div><div class="stat-sub">입원 기준</div></div>
+  </div>
+  <div class="view-body">
+    <div class="g2">
+      <div class="panel">
+        <div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 4 12 14.01 9 11.01"/></svg>이송 처리 단계 퍼널</div>
+        <div class="funnel-wrap" id="funnel-wrap"></div>
+      </div>
+      <div class="panel"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>이송 후 처분 유형</div><div style="padding:12px"><canvas id="c-disp-type" height="200"></canvas></div></div>
+    </div>
+    <div class="g2">
+      <div class="panel"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>월별 병원 수용률 추세</div><div style="padding:12px"><canvas id="c-accept" height="180"></canvas></div></div>
+      <div class="panel"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>유형별 평균 처리기간 (일)</div><div style="padding:12px"><canvas id="c-duration" height="180"></canvas></div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>응급실 현황 (주요 병원)</div>
+      <div class="scroll-y" style="max-height:200px">
+        <table class="dt"><thead><tr><th>병원명</th><th>지역</th><th>응급실 수용</th><th>대기 환자</th><th>ICU 가용</th><th>헬기 패드</th><th>상태</th></tr></thead>
+        <tbody id="hospital-tbody"></tbody></table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ V6 지역 분석 ══ -->
+<div class="view" id="v6">
+  <div class="stat-bar" style="grid-template-columns:repeat(4,1fr)">
+    <div class="stat-cell"><div class="stat-lbl">선택 지역</div><div class="stat-val blue" style="font-size:15px" id="v6-region">전국</div><div class="stat-sub" id="v6-sub">17개 광역시도</div></div>
+    <div class="stat-cell"><div class="stat-lbl">출동 건수</div><div class="stat-val" id="v6-cnt">4,284,131</div><div class="stat-sub" id="v6-rank">전국 합계</div></div>
+    <div class="stat-cell"><div class="stat-lbl">인구 10만당</div><div class="stat-val orange" id="v6-rate">8,274</div><div class="stat-sub">출동 발생률</div></div>
+    <div class="stat-cell"><div class="stat-lbl">배치 소방관</div><div class="stat-val green" id="v6-crew">62,841</div><div class="stat-sub" id="v6-station">소방서 228개</div></div>
+  </div>
+  <div class="v6-body">
+    <div class="v6-left">
+      <div class="breadcrumb" id="breadcrumb">
+        <span class="link" onclick="drillTo('전국')">전국</span>
+      </div>
+      <div class="v6-map">
+        <canvas id="map-canvas3"></canvas>
+        <div class="map-info" id="v6-map-info">시도 클릭 시 상세 드릴다운</div>
+        <div class="map-legend">
+          <div style="font-size:10px;color:var(--t3);margin-bottom:4px;font-weight:500">출동 발생률</div>
+          <div class="leg-row"><span class="leg-dot" style="background:#d1fae5"></span>낮음</div>
+          <div class="leg-row"><span class="leg-dot" style="background:#6ee7b7"></span>보통</div>
+          <div class="leg-row"><span class="leg-dot" style="background:#3ecf8e"></span>높음</div>
+          <div class="leg-row"><span class="leg-dot" style="background:#065f46"></span>매우 높음</div>
+        </div>
+      </div>
+      <div class="v6-drill">
+        <div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>월별 추세 (선택 지역)</div>
+        <div style="padding:10px 12px;flex:1"><canvas id="c-region-trend" height="120"></canvas></div>
+      </div>
+    </div>
+    <div class="v6-right">
+      <div class="panel"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>하위 지역 출동 순위</div>
+        <div class="scroll-y" style="max-height:200px"><table class="dt"><thead><tr><th>순위</th><th>지역</th><th>건수</th><th>발생률</th></tr></thead><tbody id="region-rank-tbody"></tbody></table></div>
+      </div>
+      <div class="panel" style="margin-top:10px"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/></svg>출동 유형 구성</div><div style="padding:10px"><canvas id="c-region-type" height="160"></canvas></div></div>
+      <div class="panel" style="margin-top:10px"><div class="panel-hd"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>관할 소방서 현황</div>
+        <div class="scroll-y" style="max-height:150px" id="station-list"><div style="padding:10px;font-size:11px;color:var(--t3)">지역을 클릭하세요</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /.main -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script type="module" src="https://gopang.net/auth/subsystem-auth.js"></script>
+<script>
+'use strict';
+const PROXY = 'https://gopang-proxy.tensor-city.workers.dev';
+
+/* ── SSO ── */
+window._onGopangAuth = async function(u) {
+  if (u) {
+    document.getElementById('officer-lv').textContent = (u.level||'L0') + ' 대원';
+    const guid = u.ipv6 || u.guid;
+    if (guid) {
+      try {
+        const now = new Date().toISOString();
+        await fetch(PROXY+'/pdv/report', {method:'POST',headers:{'Content-Type':'application/json'},
+          body:JSON.stringify({report:{svc:'k119',type:'event',
+            who:{ipv6:guid,role:'user',level:u.level||'L0',recipients:['gopang-pdv']},
+            when:{period_start:now,period_end:now},
+            where:{svc_url:'https://911.gopang.net/dashboard.html'},
+            what:{summary:'K-119 종합상황실 접속'},
+            how:{method:'SSO'},why:{goal:'재난 모니터링'},
+          }})});
+      } catch(e){}
+    }
+  }
+};
+
+/* ── Clock ── */
+(function tick(){ document.getElementById('clock').textContent=new Date().toLocaleString('ko-KR',{hour12:false,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'}); setTimeout(tick,1000); })();
+
+/* ── View switch ── */
+const VIEW_TITLES = {v1:'실시간 출동',v2:'재난 통계',v3:'구급 환자 분석',v4:'자원 현황',v5:'병원 연계',v6:'지역 분석'};
+let currentView = 'v1', chartsInit = {};
+
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.querySelectorAll('.sb-item[onclick]').forEach(i=>i.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('menu-'+id).classList.add('active');
+  document.getElementById('view-title').textContent = VIEW_TITLES[id];
+  currentView = id;
+  if (!chartsInit[id]) { chartsInit[id]=true; initCharts(id); }
+  if (id==='v1' && !window._mapInit1) { window._mapInit1=true; initMap(document.getElementById('map-canvas')); }
+  if (id==='v4' && !window._mapInit2) { window._mapInit2=true; initMap(document.getElementById('map-canvas2')); }
+  if (id==='v6' && !window._mapInit3) { window._mapInit3=true; initMap(document.getElementById('map-canvas3')); }
+}
+
+/* ── Sidebar hover sync ── */
+document.querySelector('.sidebar').addEventListener('mouseenter',()=>{document.getElementById('topbar').style.left='var(--sb-open)';document.getElementById('main-area').style.left='var(--sb-open)';});
+document.querySelector('.sidebar').addEventListener('mouseleave',()=>{document.getElementById('topbar').style.left='var(--sb)';document.getElementById('main-area').style.left='var(--sb)';});
+
+/* ════════════════ DATA ════════════════ */
+const MONTHS = ['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+const REGIONS = ['경기','서울','부산','경남','인천','경북','충남','전남','대구','전북','충북','강원','광주','대전','울산','제주','세종'];
+const REGION_CNT = [724281,584821,284821,248421,224821,198421,184821,161847,184821,148421,138921,124234,148821,142823,128921,48241,32234];
+const REGION_POP = [1380,980,337,325,295,259,213,188,240,181,160,154,148,149,114,68,38];
+const AGE_GROUPS = ['10대미만','10대','20대','30대','40대','50대','60대','70대+'];
+const AGE_EMERG = [124821,98421,148821,184821,214821,284821,348421,784821];
+const MONTHLY = [312421,298421,341234,354821,368421,362841,384821,378921,354821,361234,342841,323131];
+const MONTHLY_PREV = [298421,284821,324821,341234,354821,348421,368421,362841,341234,348421,328421,309131];
+
+const DISPATCHES = [
+  {id:'FD-20260604-2847',sev:1,type:'심정지',loc:'서울 강남구 역삼동',status:'active',elapsed:'00:04',crew:'김민준 구급'},
+  {id:'FD-20260604-2831',sev:1,type:'건물화재',loc:'경기 수원시 영통구',status:'dispatch',elapsed:'00:18',crew:'이소방 화재팀'},
+  {id:'FD-20260604-2819',sev:1,type:'교통사고',loc:'부산 해운대구 좌동',status:'dispatch',elapsed:'00:27',crew:'박구조 구조팀'},
+  {id:'FD-20260604-2804',sev:2,type:'가스누출',loc:'인천 부평구 부개동',status:'dispatch',elapsed:'00:42',crew:'최안전 화학팀'},
+  {id:'FD-20260604-2751',sev:2,type:'뇌졸중',loc:'대구 중구 동인동',status:'dispatch',elapsed:'00:55',crew:'정구급 구급대'},
+  {id:'FD-20260604-2738',sev:2,type:'익수',loc:'제주시 애월읍 해안',status:'dispatch',elapsed:'01:09',crew:'한수난 구조대'},
+  {id:'FD-20260604-2721',sev:3,type:'골절',loc:'광주 북구 운암동',status:'dispatch',elapsed:'01:25',crew:'오구급 구급대'},
+  {id:'FD-20260604-2708',sev:4,type:'열상',loc:'대전 유성구 봉명동',status:'resolved',elapsed:'01:38',crew:'윤구급 구급대'},
+];
+
+const UNITS = [
+  {name:'구급-서울강남1',role:'구급대',status:'출동',eta:'~3분',loc:'서울 강남'},
+  {name:'화재-수원영통',role:'소방대',status:'출동',eta:'~6분',loc:'경기 수원'},
+  {name:'구조-부산해운',role:'구조대',status:'출동',eta:'~9분',loc:'부산 해운대'},
+  {name:'화학-인천부평',role:'화학팀',status:'출동',eta:'~12분',loc:'인천 부평'},
+  {name:'구급-대구중구',role:'구급대',status:'출동',eta:'~15분',loc:'대구 중구'},
+  {name:'수난-제주애월',role:'수난구조',status:'출동',eta:'~18분',loc:'제주 애월'},
+  {name:'헬기-전남1',role:'헬기',status:'출동',eta:'~22분',loc:'전남 목포 (헬기)'},
+  {name:'AV구급-001',role:'AV구급차',status:'대기',eta:'—',loc:'서울 (AV)'},
+];
+
+const PATIENTS = [
+  {id:'FD-20260604-2847',sev:1,type:'심정지',age:'70대',status:'CPR 진행 중',hospital:'서울대학교병원',eta:'~3분'},
+  {id:'FD-20260604-2819',sev:1,type:'다발외상',age:'30대',status:'지혈 처치 중',hospital:'부산대학교병원',eta:'~8분'},
+  {id:'FD-20260604-2751',sev:2,type:'뇌졸중',age:'60대',status:'산소 투여',hospital:'경북대학교병원',eta:'~14분'},
+  {id:'FD-20260604-2738',sev:2,type:'익수',age:'20대',status:'의식 회복',hospital:'제주대학교병원',eta:'~19분'},
+  {id:'FD-20260604-2721',sev:3,type:'골절',age:'50대',status:'고정 처치',hospital:'조선대학교병원',eta:'~25분'},
+];
+
+const HOSPITALS = [
+  {name:'서울대학교병원',region:'서울',capacity:'94%',waiting:12,icu:4,heli:true,status:'주의'},
+  {name:'삼성서울병원',region:'서울',capacity:'87%',waiting:8,icu:7,heli:true,status:'정상'},
+  {name:'경북대학교병원',region:'대구',capacity:'78%',waiting:5,icu:11,heli:true,status:'정상'},
+  {name:'부산대학교병원',region:'부산',capacity:'91%',waiting:14,icu:3,heli:true,status:'주의'},
+  {name:'전남대학교병원',region:'광주',capacity:'72%',waiting:3,icu:14,heli:true,status:'정상'},
+  {name:'제주대학교병원',region:'제주',capacity:'68%',waiting:2,icu:8,heli:false,status:'정상'},
+];
+
+const CREWS = [
+  {name:'강민국',rank:'소방위',unit:'서울강남소방서',dispatch:312,avg:'3.8분',rate:'91%',grade:'우수'},
+  {name:'이수진',rank:'소방장',unit:'경기수원소방서',dispatch:287,avg:'4.4분',rate:'88%',grade:'우수'},
+  {name:'박태양',rank:'소방교',unit:'부산해운소방서',dispatch:261,avg:'5.2분',rate:'85%',grade:'우수'},
+  {name:'최하늘',rank:'소방사',unit:'인천부평소방서',dispatch:238,avg:'5.8분',rate:'82%',grade:'양호'},
+  {name:'정수련',rank:'소방위',unit:'대구중부소방서',dispatch:224,avg:'6.1분',rate:'79%',grade:'양호'},
+  {name:'한바다',rank:'소방장',unit:'제주서부소방서',dispatch:198,avg:'7.2분',rate:'76%',grade:'양호'},
+  {name:'오준서',rank:'소방교',unit:'광주북부소방서',dispatch:187,avg:'7.8분',rate:'73%',grade:'보통'},
+  {name:'임새별',rank:'소방사',unit:'대전유성소방서',dispatch:174,avg:'8.1분',rate:'71%',grade:'보통'},
+];
+
+/* ── V1 Render ── */
+function renderV1() {
+  document.getElementById('disp-tbody').innerHTML = DISPATCHES.map(d => {
+    const sc = d.sev===1?'chip-red':d.sev===2?'chip-orange':d.sev===3?'chip-gray':'chip-green';
+    const ss = d.status==='active'?'chip-red':d.status==='dispatch'?'chip-blue':'chip-green';
+    const sl = d.status==='active'?'신고접수':d.status==='dispatch'?'출동 중':'완료';
+    const act = d.status==='active'
+      ? `<button class="act-btn approve" onclick="toast('green','출동 승인','${d.id}')">출동 승인</button>`
+      : d.status==='dispatch'
+      ? `<button class="act-btn" onclick="toast('red','오버라이드','${d.id}')">오버라이드</button>`
+      : `<span style="font-size:10px;color:#1a7a4e">✓ 완료</span>`;
+    return `<tr><td style="font-family:monospace;font-size:10px;color:#1a7a4e">${d.id}</td>
+      <td><span class="chip ${sc}">${d.sev}급</span></td>
+      <td style="color:var(--t1)">${d.type}</td><td>${d.loc}</td>
+      <td><span class="chip ${ss}">${sl}</span></td>
+      <td style="font-family:monospace;color:var(--t3)">${d.elapsed}</td>
+      <td>${act}</td></tr>`;
+  }).join('');
+
+  document.getElementById('feed-list').innerHTML = [
+    {t:'13:04:11',s:1,m:'서울 강남 심정지 신고 — 구급-강남1 즉시 출동'},
+    {t:'13:02:48',s:1,m:'경기 수원 건물화재 — 소방대 3개팀 출동'},
+    {t:'13:01:33',s:1,m:'부산 해운대 교통사고 — 구급·구조 동시 출동'},
+    {t:'12:58:21',s:2,m:'인천 부평 가스누출 — 화학팀 출동'},
+    {t:'12:55:04',s:2,m:'대구 중구 뇌졸중 신고 — 구급대 배정'},
+    {t:'12:52:17',s:2,m:'제주 애월 익수 — 수난구조대 출동'},
+    {t:'12:49:38',s:3,m:'광주 북구 골절 신고 — 구급차 출동'},
+    {t:'12:46:52',s:4,m:'대전 유성 열상 신고 — 처리 완료'},
+  ].map(f=>{
+    const c=f.s===1?'var(--red)':f.s===2?'var(--orange)':'var(--t3)';
+    return `<div class="feed-item"><span class="feed-time">${f.t}</span><span style="width:6px;height:6px;border-radius:50%;background:${c};flex-shrink:0;margin-top:4px"></span><span class="feed-msg">${f.m}</span></div>`;
+  }).join('');
+
+  document.getElementById('unit-list').innerHTML = UNITS.map(u=>{
+    const isHeli = u.role==='헬기'||u.role==='AV구급차';
+    const ec = u.status==='출동'?'color:#1a7a4e':'color:var(--t3)';
+    return `<div class="unit-row">
+      <div class="unit-av" style="${isHeli?'background:rgba(124,58,237,.06);border-color:rgba(124,58,237,.2)':''}">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="${isHeli?'#7c3aed':'#3ecf8e'}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 4v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+      </div>
+      <div><div class="unit-name">${u.name}</div><div class="unit-role">${u.role}</div></div>
+      <div style="margin-left:auto;text-align:right"><div class="unit-eta" style="${ec}">${u.status==='출동'?u.eta:'대기'}</div><div class="unit-role">${u.loc}</div></div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Chart Engine ── */
+const DPR = window.devicePixelRatio || 1;
+function initCanvas(id, h) {
+  const c = document.getElementById(id); if (!c) return null;
+  const W = c.parentElement.clientWidth || 400;
+  c.width = W*DPR; c.height = h*DPR;
+  c.style.width = W+'px'; c.style.height = h+'px';
+  const ctx = c.getContext('2d'); ctx.scale(DPR,DPR);
+  return {ctx, W, H:h};
+}
+
+function drawLine(id, labels, datasets, h=200) {
+  const r = initCanvas(id,h); if(!r) return;
+  const {ctx,W,H} = r;
+  const pad = {t:14,r:12,b:28,l:48};
+  const cW=W-pad.l-pad.r, cH=H-pad.t-pad.b;
+  const all=datasets.flatMap(d=>d.data);
+  const mn=Math.min(...all)*0.92, mx=Math.max(...all)*1.08;
+  ctx.strokeStyle='rgba(0,0,0,.06)'; ctx.lineWidth=.5;
+  for(let i=0;i<=4;i++){
+    const y=pad.t+cH/4*i;
+    ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();
+    const v=mx-(mx-mn)/4*i;
+    ctx.fillStyle='rgba(0,0,0,.35)';ctx.font='9px sans-serif';ctx.textAlign='right';
+    ctx.fillText(v>=10000?Math.round(v/1000)+'k':Math.round(v),pad.l-3,y+3);
+  }
+  labels.forEach((lb,i)=>{
+    ctx.fillStyle='rgba(0,0,0,.4)';ctx.font='9px sans-serif';ctx.textAlign='center';
+    ctx.fillText(lb,pad.l+cW/(labels.length-1)*i,H-pad.b+11);
+  });
+  datasets.forEach(ds=>{
+    const pts=ds.data.map((v,i)=>({x:pad.l+cW/(ds.data.length-1)*i,y:pad.t+cH*(1-(v-mn)/(mx-mn))}));
+    const [r2,g2,b2]=ds.color.match(/\d+/g)||[62,207,142];
+    ctx.beginPath();ctx.moveTo(pts[0].x,pad.t+cH);
+    pts.forEach(p=>ctx.lineTo(p.x,p.y));ctx.lineTo(pts[pts.length-1].x,pad.t+cH);ctx.closePath();
+    ctx.fillStyle=`rgba(${r2},${g2},${b2},.08)`;ctx.fill();
+    ctx.beginPath();pts.forEach((p,i)=>i===0?ctx.moveTo(p.x,p.y):ctx.lineTo(p.x,p.y));
+    ctx.strokeStyle=ds.color;ctx.lineWidth=1.5;ctx.setLineDash(ds.dash||[]);ctx.stroke();ctx.setLineDash([]);
+    pts.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,2.5,0,Math.PI*2);ctx.fillStyle=ds.color;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1;ctx.stroke();});
+  });
+}
+
+function drawBar(id, labels, data, color, h=200, hbar=false) {
+  const r=initCanvas(id,h);if(!r)return;
+  const {ctx,W,H}=r;
+  const maxV=Math.max(...data)*1.12;
+  if(hbar){
+    const pad={l:88,r:12,t:8,b:8};
+    const cW=W-pad.l-pad.r,cH=H-pad.t-pad.b;
+    const bH=Math.min(16,cH/labels.length-4);
+    const gap=(cH-bH*labels.length)/(labels.length+1);
+    labels.forEach((lb,i)=>{
+      const v=data[i];const bW=cW*(v/maxV);
+      const y=pad.t+gap*(i+1)+bH*i;
+      ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(pad.l,y,bW,bH,2);ctx.fill();
+      ctx.fillStyle='rgba(0,0,0,.45)';ctx.font='9px sans-serif';ctx.textAlign='right';ctx.fillText(lb,pad.l-5,y+bH/2+3);
+      ctx.textAlign='left';ctx.fillStyle='rgba(0,0,0,.35)';ctx.fillText(v>=10000?Math.round(v/1000)+'k':v,pad.l+bW+4,y+bH/2+3);
+    });
+  } else {
+    const pad={t:10,r:12,b:32,l:42};
+    const cW=W-pad.l-pad.r,cH=H-pad.t-pad.b;
+    const bW=Math.max(4,cW/labels.length*0.6);
+    const gap=cW/labels.length;
+    ctx.strokeStyle='rgba(0,0,0,.06)';ctx.lineWidth=.5;
+    for(let i=0;i<=4;i++){
+      const y=pad.t+cH/4*i;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(pad.l+cW,y);ctx.stroke();
+      const v=maxV*(1-i/4);ctx.fillStyle='rgba(0,0,0,.35)';ctx.font='9px sans-serif';ctx.textAlign='right';
+      ctx.fillText(v>=10000?Math.round(v/1000)+'k':Math.round(v),pad.l-3,y+3);
+    }
+    data.forEach((v,i)=>{
+      const x=pad.l+gap*i+gap/2-bW/2;const bH2=cH*(v/maxV);
+      ctx.fillStyle=color;ctx.beginPath();ctx.roundRect(x,pad.t+cH-bH2,bW,bH2,2);ctx.fill();
+    });
+    labels.forEach((lb,i)=>{
+      ctx.fillStyle='rgba(0,0,0,.4)';ctx.font='9px sans-serif';ctx.textAlign='center';
+      ctx.fillText(lb,pad.l+gap*i+gap/2,H-pad.b+11);
+    });
+  }
+}
+
+function drawDonut(id, labels, values, colors, h=200) {
+  const r=initCanvas(id,h);if(!r)return;
+  const {ctx,W,H}=r;
+  const cx=W*.37,cy=H/2,R=Math.min(cx,cy)*.85,ri=R*.55;
+  const total=values.reduce((a,b)=>a+b,0);
+  let angle=-Math.PI/2;
+  values.forEach((v,i)=>{
+    const sweep=v/total*Math.PI*2;
+    ctx.beginPath();ctx.moveTo(cx,cy);ctx.arc(cx,cy,R,angle,angle+sweep);ctx.closePath();
+    ctx.fillStyle=colors[i];ctx.fill();
+    ctx.beginPath();ctx.arc(cx,cy,ri,0,Math.PI*2);ctx.fillStyle='#fff';ctx.fill();
+    angle+=sweep;
+  });
+  ctx.font='10px sans-serif';ctx.textAlign='left';
+  labels.forEach((lb,i)=>{
+    const lx=W*.58,ly=H*.12+i*16;
+    ctx.fillStyle=colors[i];ctx.fillRect(lx,ly-7,8,8);
+    ctx.fillStyle='rgba(0,0,0,.5)';ctx.fillText(`${lb} (${Math.round(values[i]/total*100)}%)`,lx+11,ly);
+  });
+}
+
+function drawPyramid(id, h=220) {
+  const r=initCanvas(id,h);if(!r)return;
+  const {ctx,W,H}=r;
+  const male=[12421,48421,98421,124821,164821,224821,274821,320241];
+  const female=[11421,42421,78421,98421,128421,184821,224821,464580];
+  const maxV=Math.max(...male,...female)*1.1;
+  const cx=W/2,pad=8,bH=Math.min(20,(H-pad*2)/AGE_GROUPS.length-4);
+  AGE_GROUPS.forEach((ag,i)=>{
+    const y=pad+(bH+4)*i;
+    const mW=male[i]/maxV*(cx-70),fW=female[i]/maxV*(cx-70);
+    ctx.fillStyle='rgba(62,207,142,.7)';ctx.beginPath();ctx.roundRect(cx-4-mW,y,mW,bH,2);ctx.fill();
+    ctx.fillStyle='rgba(29,78,216,.6)';ctx.beginPath();ctx.roundRect(cx+4,y,fW,bH,2);ctx.fill();
+    ctx.fillStyle='rgba(0,0,0,.45)';ctx.font='9px sans-serif';ctx.textAlign='center';ctx.fillText(ag,cx,y+bH/2+3);
+    ctx.textAlign='right';ctx.fillText(Math.round(male[i]/1000)+'k',cx-4-mW-2,y+bH/2+3);
+    ctx.textAlign='left';ctx.fillText(Math.round(female[i]/1000)+'k',cx+4+fW+2,y+bH/2+3);
+  });
+  ctx.fillStyle='rgba(62,207,142,.9)';ctx.font='9px sans-serif';ctx.textAlign='right';ctx.fillText('남성',cx-8,H-2);
+  ctx.fillStyle='rgba(29,78,216,.9)';ctx.textAlign='left';ctx.fillText('여성',cx+8,H-2);
+}
+
+function drawHour(id, h=200) {
+  const r=initCanvas(id,h);if(!r)return;
+  const {ctx,W,H}=r;
+  const vals=[1.8,1.2,0.9,0.8,0.9,1.4,2.1,3.2,4.1,4.8,5.1,4.9,4.2,3.8,4.2,5.1,6.8,8.2,9.7,8.9,7.4,5.8,4.1,2.8];
+  const maxV=Math.max(...vals);
+  const pad={l:8,r:8,t:10,b:22};
+  const cW=W-pad.l-pad.r,bW=cW/24,cH=H-pad.t-pad.b;
+  vals.forEach((v,i)=>{
+    const ratio=v/maxV;const alpha=0.1+ratio*0.85;
+    ctx.fillStyle=`rgba(62,207,142,${alpha})`;
+    ctx.beginPath();ctx.roundRect(pad.l+bW*i+1,pad.t,bW-2,cH,2);ctx.fill();
+    if(i%3===0){ctx.fillStyle='rgba(0,0,0,.4)';ctx.font='9px sans-serif';ctx.textAlign='center';ctx.fillText(i+'시',pad.l+bW*i+bW/2,H-pad.b+11);}
+  });
+}
+
+function drawAgeHeatmap() {
+  const diseases=['심정지','뇌졸중','골절','화상','외상','중독'];
+  const dat=[[2421,1241,4821,1821,8421,2841],[8421,3241,14821,4821,24821,8421],[18421,8421,24821,8821,48421,18421],[24821,12421,48821,12421,64821,24421],[28421,18421,64821,14821,84821,28421],[48421,42421,84821,18421,124821,38421],[84421,68421,124821,24421,184821,58421],[124821,184421,148821,38421,248821,88421]];
+  const maxV=Math.max(...dat.flat());
+  let html=`<table class="hm-table"><thead><tr><th>연령\\유형</th>${diseases.map(d=>`<th>${d}</th>`).join('')}</tr></thead><tbody>`;
+  AGE_GROUPS.forEach((ag,ai)=>{
+    html+=`<tr><th style="text-align:left">${ag}</th>`;
+    dat[ai].forEach(v=>{
+      const ratio=v/maxV;const a=0.08+ratio*0.85;
+      html+=`<td style="background:rgba(62,207,142,${a.toFixed(2)});color:${ratio>0.5?'#fff':'var(--t1)'}">${v>=10000?Math.round(v/1000)+'k':v}</td>`;
+    });
+    html+='</tr>';
+  });
+  html+='</tbody></table>';
+  document.getElementById('age-heatmap').innerHTML=html;
+}
+
+function drawCrosstab() {
+  const types=['구급','화재','구조','수난','화학'];
+  const dat=[[724281,284821,184821,98421,68421,58421,54821,48421],[284821,128421,84821,48421,38421,28421,24821,21841],[184821,78421,54821,28421,21841,18421,14821,12841],[21841,8421,5821,2841,1841,1241,984,741],[18421,7421,4821,2241,1641,1241,841,641]];
+  const maxV=Math.max(...dat.flat());
+  let html=`<table class="hm-table"><thead><tr><th>유형\\시도</th>${REGIONS.slice(0,8).map(r=>`<th>${r}</th>`).join('')}</tr></thead><tbody>`;
+  types.forEach((t,ti)=>{
+    html+=`<tr><th style="text-align:left">${t}</th>`;
+    dat[ti].forEach(v=>{
+      const ratio=v/maxV;const a=0.08+ratio*0.85;
+      html+=`<td style="background:rgba(62,207,142,${a.toFixed(2)});color:${ratio>0.5?'#fff':'var(--t1)'}">${v>=10000?Math.round(v/1000)+'k':v}</td>`;
+    });
+    html+='</tr>';
+  });
+  html+='</tbody></table>';
+  document.getElementById('crosstab-wrap').innerHTML=html;
+}
+
+function renderEquip() {
+  const e=[{n:'구급차',t:1284,a:987},{n:'소방펌프차',t:3847,a:2981},{n:'화학차',t:312,a:241},{n:'헬기',t:48,a:38},{n:'AV구급차',t:48,a:31},{n:'고가사다리차',t:421,a:314}];
+  document.getElementById('equip-list').innerHTML=e.map(x=>{
+    const p=Math.round(x.a/x.t*100);
+    return `<div class="equip-item"><div style="display:flex;justify-content:space-between;font-size:11px"><span style="color:var(--t2)">${x.n}</span><span style="color:var(--t3)">${x.a}/${x.t}대</span></div><div class="equip-bar-wrap"><div class="equip-bar-fill" style="width:${p}%"></div></div></div>`;
+  }).join('');
+}
+
+function renderCrews() {
+  document.getElementById('crew-tbody').innerHTML=CREWS.map(c=>{
+    const gc=c.grade==='우수'?'chip-green':c.grade==='양호'?'chip-blue':'chip-gray';
+    return `<tr><td>${c.name}</td><td>${c.rank}</td><td>${c.unit}</td><td>${c.dispatch}회</td><td>${c.avg}</td><td>${c.rate}</td><td><span class="chip ${gc}">${c.grade}</span></td></tr>`;
+  }).join('');
+}
+
+function renderFunnel() {
+  const steps=[{l:'신고 접수',v:4284131},{l:'출동 지령',v:4121847},{l:'현장 도착',v:4021247},{l:'처치 완료',v:3784821},{l:'병원 이송',v:2184821},{l:'응급실 수용',v:2105284},{l:'입원·처리',v:1284821}];
+  const maxF=steps[0].v;
+  document.getElementById('funnel-wrap').innerHTML=steps.map((s,i)=>{
+    const p=Math.round(s.v/maxF*100);const a=1-i*0.1;
+    return `<div class="funnel-step"><span class="funnel-label">${s.l}</span><div class="funnel-bar-wrap"><div class="funnel-bar" style="width:${p}%;background:rgba(62,207,142,${a})">${p}%</div></div><span class="funnel-val">${s.v>=100000?Math.round(s.v/10000)+'만':s.v.toLocaleString()}</span></div>`;
+  }).join('');
+}
+
+function renderHospitals() {
+  document.getElementById('hospital-tbody').innerHTML=HOSPITALS.map(h=>{
+    const sc=parseInt(h.capacity)>90?'chip-red':parseInt(h.capacity)>80?'chip-orange':'chip-green';
+    const stc=h.status==='주의'?'chip-orange':'chip-green';
+    return `<tr><td style="font-weight:500;color:var(--t1)">${h.name}</td><td>${h.region}</td><td><span class="chip ${sc}">${h.capacity}</span></td><td>${h.waiting}명</td><td>${h.icu}병상</td><td>${h.heli?'✓':'-'}</td><td><span class="chip ${stc}">${h.status}</span></td></tr>`;
+  }).join('');
+}
+
+function renderPatients() {
+  document.getElementById('patient-tbody').innerHTML=PATIENTS.map(p=>{
+    const sc=p.sev===1?'chip-red':p.sev===2?'chip-orange':'chip-gray';
+    return `<tr><td style="font-family:monospace;font-size:10px;color:#1a7a4e">${p.id}</td><td><span class="chip ${sc}">${p.sev}급</span></td><td>${p.type}</td><td>${p.age}</td><td>${p.status}</td><td>${p.hospital}</td><td style="color:#1a7a4e;font-weight:500">${p.eta}</td></tr>`;
+  }).join('');
+}
+
+function renderRegionRank() {
+  const ranked=REGIONS.map((r,i)=>({name:r,cnt:REGION_CNT[i],rate:Math.round(REGION_CNT[i]/REGION_POP[i])})).sort((a,b)=>b.cnt-a.cnt);
+  document.getElementById('region-rank-tbody').innerHTML=ranked.map((r,i)=>`<tr>
+    <td style="color:var(--t3)">${i+1}</td>
+    <td style="cursor:pointer;color:#1a7a4e" onclick="drillTo('${r.name}')">${r.name}</td>
+    <td style="font-variant-numeric:tabular-nums">${r.cnt.toLocaleString()}</td>
+    <td><span class="chip ${r.rate>8000?'chip-red':r.rate>6000?'chip-orange':'chip-gray'}">${r.rate}</span></td>
+  </tr>`).join('');
+}
+
+function drillTo(region) {
+  document.getElementById('v6-region').textContent = region;
+  const bc = document.getElementById('breadcrumb');
+  if (region==='전국') bc.innerHTML=`<span class="link" onclick="drillTo('전국')">전국</span>`;
+  else bc.innerHTML=`<span class="link" onclick="drillTo('전국')">전국</span><span style="color:var(--t3)"> / </span><span class="link">${region}</span>`;
+}
+
+/* ── Map Canvas ── */
+const MAP_POINTS = [
+  {x:.48,y:.28,t:'s1',lb:'심정지'},{x:.44,y:.35,t:'s1',lb:'화재'},{x:.58,y:.65,t:'s1',lb:'교통'},
+  {x:.42,y:.38,t:'s2',lb:'가스'},{x:.61,y:.48,t:'s2',lb:'뇌졸중'},{x:.41,y:.72,t:'s2',lb:'익수'},
+  {x:.52,y:.41,t:'s3',lb:'골절'},{x:.38,y:.42,t:'crew',lb:'구급-1'},{x:.56,y:.38,t:'crew',lb:'소방-2'},
+  {x:.46,y:.72,t:'heli',lb:'헬기-1'},{x:.29,y:.55,t:'heli',lb:'AV-001'},
+];
+
+function initMap(canvas) {
+  if (!canvas) return;
+  function draw() {
+    const W=canvas.parentElement.clientWidth||400, H=canvas.parentElement.clientHeight||300;
+    canvas.width=W*DPR; canvas.height=H*DPR;
+    canvas.style.width=W+'px'; canvas.style.height=H+'px';
+    const ctx=canvas.getContext('2d'); ctx.scale(DPR,DPR);
+    const grad=ctx.createLinearGradient(0,0,W,H);
+    grad.addColorStop(0,'#eef4f0'); grad.addColorStop(1,'#e8f0eb');
+    ctx.fillStyle=grad; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(62,207,142,.08)'; ctx.lineWidth=.5;
+    for(let gx=0;gx<W;gx+=60){ctx.beginPath();ctx.moveTo(gx,0);ctx.lineTo(gx,H);ctx.stroke();}
+    for(let gy=0;gy<H;gy+=60){ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();}
+    ctx.beginPath();ctx.ellipse(W*.5,H*.5,W*.4,H*.3,0,0,Math.PI*2);
+    ctx.fillStyle='rgba(62,207,142,.06)';ctx.fill();
+    ctx.strokeStyle='rgba(62,207,142,.15)';ctx.lineWidth=1.5;ctx.stroke();
+    const now=Date.now();
+    MAP_POINTS.forEach(p=>{
+      const x=p.x*W,y=p.y*H;
+      const color=p.t==='s1'?'#dc2626':p.t==='s2'?'#ea580c':p.t==='s3'?'#ca8a04':p.t==='crew'?'#3ecf8e':'#7c3aed';
+      const R=p.t==='s1'||p.t==='s2'?8:6;
+      if(p.t==='s1'){
+        const pulse=(Math.sin(now/500)+1)/2;
+        ctx.beginPath();ctx.arc(x,y,R+5+pulse*5,0,Math.PI*2);
+        ctx.strokeStyle=`rgba(220,38,38,${.25-pulse*.15})`;ctx.lineWidth=1.5;ctx.stroke();
+      }
+      ctx.beginPath();ctx.arc(x,y,R,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();
+      ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+      ctx.fillStyle='#374151';ctx.font='9px sans-serif';ctx.textAlign='center';ctx.fillText(p.lb,x,y+R+11);
+    });
+  }
+  let raf;
+  (function loop(){ draw(); raf=requestAnimationFrame(loop); })();
+}
+
+/* ── Init Charts by View ── */
+function initCharts(id) {
+  const COLORS=['#3ecf8e','#dc2626','#ea580c','#ca8a04','#7c3aed','#1d4ed8','#0891b2','#be185d','#78716c'];
+  if (id==='v2') setTimeout(()=>{
+    drawDonut('c-donut',['구급','화재','구조','수난','화학','기타'],[3121847,421284,487421,98421,54821,100337],COLORS);
+    drawLine('c-trend',MONTHS,[{data:MONTHLY,color:'#3ecf8e'},{data:MONTHLY_PREV,color:'#9ca3af',dash:[4,3]}]);
+    drawBar('c-region',REGIONS,REGION_CNT,'#3ecf8e',220,true);
+    drawHour('c-hour',220);
+    drawCrosstab();
+  },50);
+  if (id==='v3') setTimeout(()=>{
+    drawPyramid('c-pyramid');
+    drawAgeHeatmap();
+    drawLine('c-survival',['2020','2021','2022','2023','2024'],[{data:[6.8,7.1,7.4,7.8,8.7],color:'#3ecf8e'}]);
+    drawDonut('c-sev-donut',['1급 위독','2급 긴급','3급 응급','4급 지연'],[91763,437241,984821,670996],['#dc2626','#ea580c','#ca8a04','#3ecf8e']);
+    renderPatients();
+  },50);
+  if (id==='v4') setTimeout(()=>{
+    drawBar('c-eta',['3분↓','3~5분','5~7분','7~10분','10~15분','15분↑'],[12421,48421,284821,312421,98421,28421],'#3ecf8e');
+    drawDonut('c-result',['입원이송','현장처치','현장사망','거절·귀가','기타'],[2184821,1248421,28421,487821,334648],COLORS);
+    renderEquip();
+    drawLine('c-disp-trend',MONTHS,[{data:MONTHLY,color:'#3ecf8e'}]);
+    renderCrews();
+  },50);
+  if (id==='v5') setTimeout(()=>{
+    renderFunnel();
+    drawDonut('c-disp-type',['입원','외래처치','현장처치','사망','기타'],[1024821,684821,387421,28421,59337],COLORS);
+    drawLine('c-accept',MONTHS,[{data:[95.2,94.8,96.1,96.8,96.4,95.9,96.2,97.1,96.8,96.4,96.1,95.8],color:'#3ecf8e'}]);
+    drawBar('c-duration',['심정지','화상','뇌졸중','외상','골절','중독','화재피해','일반구급'],[48,42,38,32,21,18,14,8],'#3ecf8e',180,true);
+    renderHospitals();
+  },50);
+  if (id==='v6') setTimeout(()=>{
+    renderRegionRank();
+    drawLine('c-region-trend',MONTHS,[{data:MONTHLY,color:'#3ecf8e'}]);
+    drawDonut('c-region-type',['구급','화재','구조','수난','화학','기타'],[3121847,421284,487421,98421,54821,100337],COLORS);
+  },50);
+}
+
+/* ── Simulation ── */
+const TYPES=['심정지','뇌졸중','화재','교통사고','가스누출','익수','골절','화상','붕괴'];
+const LOCS=['서울 강남','서울 마포','경기 수원','부산 해운대','인천 연수','대구 달서','광주 북구','대전 유성','제주 애월'];
+const SEVS=[1,1,2,2,2,3,3,4,4];
+let seq=2848;
+setInterval(()=>{
+  const sev=SEVS[Math.floor(Math.random()*SEVS.length)];
+  const type=TYPES[Math.floor(Math.random()*TYPES.length)];
+  const loc=LOCS[Math.floor(Math.random()*LOCS.length)];
+  const id='FD-20260604-'+seq++;
+  DISPATCHES.unshift({id,sev,type,loc,status:'active',elapsed:'00:00',crew:'자동 배정 중'});
+  if(DISPATCHES.length>15)DISPATCHES.pop();
+  const cnt1=DISPATCHES.filter(d=>d.sev===1&&d.status!=='resolved').length;
+  document.getElementById('sev1-cnt').textContent=cnt1;
+  document.getElementById('v1-sev1').textContent=cnt1;
+  document.getElementById('v1-active').textContent=DISPATCHES.filter(d=>d.status!=='resolved').length;
+  if(currentView==='v1')renderV1();
+  if(sev===1)toast('red',`1급 ${type} 신고`,loc);
+  else if(sev===2)toast('green',`2급 ${type} 신고`,loc);
+},9000);
+
+/* ── Toast ── */
+function toast(type,title,sub){
+  const wrap=document.getElementById('toast-wrap');
+  const div=document.createElement('div');
+  div.className='toast '+(type||'');
+  div.innerHTML=`<div><div class="toast-title">${title}</div><div class="toast-sub">${sub}</div></div>`;
+  wrap.appendChild(div);
+  setTimeout(()=>{div.style.opacity='0';div.style.transition='opacity .25s';setTimeout(()=>div.remove(),250);},4000);
+}
+function allDispatch(){toast('red','전체 긴급 출동','모든 대기 인력 즉시 출동');}
+
+/* ── Init ── */
+document.body.classList.add('has-sidebar');
+renderV1();
+chartsInit['v1']=true;
+initMap(document.getElementById('map-canvas'));
+toast('green','K-119 종합상황실','실시간 모니터링 시작');
+</script>
+</body>
+</html>
