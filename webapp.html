@@ -183,6 +183,12 @@ button{font-family:var(--font);cursor:pointer;border:none}
 .send-btn:disabled{background:var(--bd2);border-color:var(--bd2);cursor:not-allowed}
 .send-btn:not(:disabled):hover{background:#2db87a}
 
+/* 마이크 버튼 */
+.mic-btn{width:32px;height:32px;border-radius:6px;background:var(--bg);border:.5px solid var(--bd);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;transition:background .12s}
+.mic-btn.active{background:var(--red-bg);border-color:var(--red-bd)}
+.mic-btn svg{width:13px;height:13px;stroke:var(--t2);stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.mic-btn.active svg{stroke:var(--red)}
+
 /* Auth loading */
 #auth-loading{position:fixed;inset:0;z-index:9999;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
 .spinner{width:24px;height:24px;border:2px solid var(--bd2);border-top-color:var(--brand);border-radius:50%;animation:spin .7s linear infinite}
@@ -311,6 +317,9 @@ button{font-family:var(--font);cursor:pointer;border:none}
       <div class="input-wrap">
         <textarea id="msg-input" rows="1" placeholder="상황을 말씀해 주세요…"></textarea>
       </div>
+      <button class="mic-btn" id="mic-btn" onclick="toggleMic()">
+        <svg viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M5 10a7 7 0 0 0 14 0"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg>
+      </button>
       <button class="send-btn" id="send-btn" disabled>
         <svg width="13" height="13" viewBox="0 0 24 24" fill="#fff"><path d="m22 2-7 20-4-9-9-4 20-7z"/></svg>
       </button>
@@ -461,20 +470,11 @@ async function handleEmergency(text) {
     appendAI(`위 응급처치 가이드를 즉시 시작해 주세요. 구급대가 도착할 때까지 멈추지 마세요.`, sev);
   }
 
-  // PDV
-  if (_user) {
-    const guid = _user.ipv6 || _user.guid;
-    const now = new Date().toISOString();
-    fetch(PROXY_BASE+'/pdv/report', {method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({report:{svc:'911',type:'dispatch',
-        who:{ipv6:guid,role:'user',level:_user.level||'L0',recipients:['gopang-pdv']},
-        when:{period_start:now,period_end:now},
-        where:{svc_url:'https://911.gopang.net/webapp.html'},
-        what:{summary:`K-119 출동 신고 — ${type} ${sev}급 / ${dispNo}`,dispatch_no:dispNo,severity:sev,hospital,eta},
-        how:{method:'K-119 AI 구조대원 자동 분류'},
-        why:{goal:'응급 대응 출동 요청'},
-      }})}).catch(()=>{});
-  }
+  // PDV 표준 — 출동 기록
+  _recordPdv(
+    `K-119 출동 신고 — ${type} ${sev}급 / ${dispNo}`,
+    '응급 대응 출동 요청'
+  );
 }
 
 /* ── AI call ── */
@@ -518,13 +518,37 @@ async function sendMessage(text) {
   document.getElementById('send-btn').disabled = false;
 }
 
+/* ── autoResize / updateSendBtn ── */
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 80) + 'px';
+}
+function updateSendBtn() {
+  const inp = document.getElementById('msg-input');
+  const btn = document.getElementById('send-btn');
+  if (btn) btn.disabled = !inp.value.trim();
+}
+
 /* ── Input events ── */
 document.addEventListener('DOMContentLoaded', () => {
   const inp = document.getElementById('msg-input');
   const btn = document.getElementById('send-btn');
-  inp.addEventListener('input', () => { inp.style.height='auto'; inp.style.height=Math.min(inp.scrollHeight,80)+'px'; btn.disabled=!inp.value.trim(); });
+  inp.addEventListener('input', () => { autoResize(inp); updateSendBtn(); });
   inp.addEventListener('keydown', e => { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();if(!btn.disabled)sendMessage(inp.value.trim());} });
   btn.addEventListener('click', () => sendMessage(inp.value.trim()));
+
+  // ctx 파라미터 — ctx_enc=b64 분기
+  (function initCtx() {
+    const params = new URLSearchParams(location.search);
+    const ctxRaw = params.get('ctx') || '';
+    const ctxEnc = params.get('ctx_enc');
+    const ctx = ctxRaw
+      ? (ctxEnc === 'b64'
+          ? decodeURIComponent(escape(atob(ctxRaw)))
+          : decodeURIComponent(ctxRaw))
+      : null;
+    if (ctx) setTimeout(() => sendMessage(ctx), 500);
+  })();
 });
 
 /* ── Auth ── */
@@ -535,32 +559,128 @@ window._onGopangAuth = async function(user) {
   document.getElementById('chat-badge').textContent = user?.level || 'L0';
 
   const guid = user?.ipv6 || user?.guid || null;
-  if (!guid) { appendAI('안녕하세요! K-119 AI 구조대원입니다.\n화재·구조·구급·재난 상황을 말씀해 주세요.'); return; }
+  if (!guid) { appendAI('안녕하세요! K-119 AI 구조대원입니다.
+화재·구조·구급·재난 상황을 말씀해 주세요.'); return; }
 
   const hour = new Date().getHours();
   const greet = hour<12?'좋은 아침입니다':hour<18?'안녕하세요':'좋은 저녁입니다';
-  appendAI(`${greet}! K-119 AI 구조대원입니다.\n\n**화재·구조·구급·재난** 모든 상황에 즉시 대응합니다.\n\n긴급 상황이라면 지금 바로 상황을 말씀해 주세요. 구급대가 즉시 출동합니다.`, null, 'info');
+  appendAI(`${greet}! K-119 AI 구조대원입니다.
+
+**화재·구조·구급·재난** 모든 상황에 즉시 대응합니다.
+
+긴급 상황이라면 지금 바로 상황을 말씀해 주세요. 구급대가 즉시 출동합니다.`, null, 'info');
 
   const clean = new URL(location.href);
   ['gwp','gwp_token','ctx','origin'].forEach(k=>clean.searchParams.delete(k));
   history.replaceState({},'',clean.toString());
 
-  // PDV
-  try {
-    const now = new Date().toISOString();
-    const res = await fetch(PROXY_BASE+'/pdv/report', {method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({report:{svc:'911',type:'event',
-        who:{ipv6:guid,role:'user',level:user?.level||'L0',recipients:['gopang-pdv']},
-        when:{period_start:now,period_end:now},
-        where:{svc_url:'https://911.gopang.net/webapp.html'},
-        what:{summary:'K-119 앱 접속'},
-        how:{method:'고팡 SSO 자동 인증 (경로: '+(user?.via||'session')+')'},
-        why:{goal:'응급 상황 대비 AI 구조대원 연결'},
-      }})});
-    const data = await res.json();
-    console.log('[K-119 PDV]', data.pdv_entry, data.message);
-  } catch(e) { console.warn('[K-119 PDV]', e.message); }
+  // PDV 표준 — 접속 기록
+  _recordPdv('K-119 앱 접속', '응급 상황 대비 AI 구조대원 연결', guid);
 };
+
+/* ── PDV 표준 payload { user_guid, source, report: { pdv_6w } } ── */
+function _recordPdv(what, why, guid_override) {
+  try {
+    const user_guid = guid_override || _user?.ipv6 || _user?.guid || 'anonymous';
+    const payload = {
+      user_guid,
+      source: 'k119',
+      report: {
+        pdv_6w: {
+          who:   user_guid,
+          when:  new Date().toISOString(),
+          where: location.href,
+          what,
+          how:   'K-119 AI 구조대원',
+          why,
+        },
+      },
+    };
+    fetch(`${PROXY_BASE}/pdv_log`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).catch(() => {});
+  } catch(e) { console.warn('[PDV]', e.message); }
+}
+
+/* ── 마이크 — v3.6 패턴 ── */
+let micActive = false;
+let recognition = null;
+let mediaRecorder = null;
+let audioChunks = [];
+
+function _micSetUI(active) {
+  micActive = active;
+  const btn = document.getElementById('mic-btn');
+  if (btn) btn.classList.toggle('active', active);
+}
+
+function _micStartWebSpeech(SR) {
+  recognition = new SR();
+  recognition.lang           = 'ko-KR';
+  recognition.continuous     = false;
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.onresult = (e) => {
+    const t = e.results[0][0].transcript;
+    const inp = document.getElementById('msg-input');
+    if (inp && t) {
+      inp.value = t;
+      autoResize(inp);   // ★ 직접 호출
+      updateSendBtn();   // ★ 직접 호출
+    }
+    _micSetUI(false);
+    setTimeout(() => { if (inp?.value.trim()) sendMessage(inp.value.trim()); }, 100);
+  };
+
+  recognition.onerror = (e) => {
+    _micSetUI(false);
+    console.warn('[Mic] 오류:', e.error);
+    if (e.error !== 'aborted') appendAI('🎤 음성 인식 오류: ' + e.error);
+  };
+
+  recognition.onend = () => { _micSetUI(false); };
+
+  recognition.start();
+  _micSetUI(true);
+}
+
+async function _micStartMediaRecorder() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioChunks = [];
+    mediaRecorder = new MediaRecorder(stream);
+    mediaRecorder.ondataavailable = e => audioChunks.push(e.data);
+    mediaRecorder.onstop = async () => {
+      stream.getTracks().forEach(t => t.stop());
+      _micSetUI(false);
+    };
+    mediaRecorder.start();
+    _micSetUI(true);
+  } catch(e) {
+    _micSetUI(false);
+  }
+}
+
+function toggleMic() {
+  if (micActive) {
+    if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop();
+    _micSetUI(false);
+    return;
+  }
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!isIOS && SR) {
+    _micStartWebSpeech(SR);
+  } else if (isIOS && window.MediaRecorder) {
+    _micStartMediaRecorder();
+  } else {
+    appendAI('🎤 이 브라우저에서는 음성 인식을 지원하지 않습니다.');
+  }
+}
 </script>
 </body>
 </html>
