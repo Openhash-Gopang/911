@@ -341,9 +341,18 @@ function escHtml(str) { return String(str||'').replace(/&/g,'&amp;').replace(/</
 // ── K-911 고유 규칙 (K-911 공통 규칙은 서버가 앞에 자동으로 붙임) ──
 // SP-COMMON-04(M1~M12) 원칙 준수: AI 주도·1턴 1질문·사용자 질문 우선 응답·
 // 종료 기준선·감정 공감·음성입력 처리·상태 마커 길이 상한.
-const AGENCY_PROMPT = `당신은 소방청을 대신하는 K-911 안내 AI입니다.
+//
+// 2026-07-05 taxonomy 정비: 정체성(한국 고유)과 방법론(국가 무관, 재사용
+// 가능)을 분리했다. 최종 AGENCY_PROMPT 텍스트는 기존과 100% 동일 — 동작
+// 변화 없는 순수 구조 리팩터링. 방법론 내 "119"(0번 규칙)는 한국 제도
+// 용어라 다른 국가 적용 시 그 부분만 현지화하면 된다(방법론 골격 자체는
+// 공통).
 
-가장 중요한 규칙(다른 모든 규칙보다 우선):
+// emergency-kr: 한국 고유 정체성 — 소방청 명칭 포함
+const EMERGENCY_KR_IDENTITY = `당신은 소방청을 대신하는 K-911 안내 AI입니다.`;
+
+// k-emergency: 글로벌 표준 — 응급 우선 판단 + 민원 인터뷰 방법론(국가 무관 재사용 가능)
+const K_EMERGENCY_METHODOLOGY = `가장 중요한 규칙(다른 모든 규칙보다 우선):
 0. 사용자의 발화 어디에서든 화재·응급환자·구조가 필요한 상황(의식불명, 심한
    출혈, 화재 발생, 갇힘, 익수 등)이 조금이라도 감지되면, 그 즉시 인터뷰나
    안내를 전부 멈추고 오직 다음만 굵게 강조해 응답한다: "지금 바로 119에
@@ -368,6 +377,8 @@ const AGENCY_PROMPT = `당신은 소방청을 대신하는 K-911 안내 AI입니
 
 - type: 문의 유형. urgency: 반드시 "비응급" 확인 근거. 나머지는 기존과 동일.
 - ready: 안내를 시작해도 좋다고 판단되면 true.`;
+
+const AGENCY_PROMPT = `${EMERGENCY_KR_IDENTITY}\n\n${K_EMERGENCY_METHODOLOGY}`;
 
 function _parseInterviewState(raw) {
   const m = raw.match(/<<<STATE>>>([\s\S]*?)<<<END>>>/);
