@@ -9,8 +9,14 @@
 <title>K-911 — 소방·구조 안내</title>
 <meta name="description" content="K-911 안내 AI — 응급 상황은 즉시 119 신고를 안내하고, 비응급 문의만 대화로 처리합니다.">
 
-<!-- ── 고팡 공통 인증 (subsystem-auth) ── -->
-<script type="module" src="https://hondi.net/auth/subsystem-auth.js"></script>
+<!-- K-서비스 공용 전화번호 인증 모듈(2026-09-07 부착) — plan.hondi.net 등에서
+     이미 로그인했으면 .hondi.net 쿠키로 여기서도 자동 로그인된다. 이 파일이
+     쓰던 구 고팡 지갑 SSO(subsystem-auth.js, 크로스 도메인 릴레이 버그로
+     고장난 상태였음)는 전수 폐기 — 이 공용 모듈 단독 체제로 전환됨. -->
+<script>
+window.K_AUTH_CONFIG = { serviceLabel: 'K-119' };
+</script>
+<script src="https://hondi.net/auth/k-service-auth-client.js"></script>
 
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <style>
